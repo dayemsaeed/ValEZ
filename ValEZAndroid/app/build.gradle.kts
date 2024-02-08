@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     kotlin("kapt")
     id("dagger.hilt.android.plugin")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -53,11 +54,13 @@ android {
 
 dependencies {
     // Core Libraries
-    implementation("androidx.core:core-ktx:1.10.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-    implementation("androidx.activity:activity-compose:1.7.0")
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation("androidx.activity:activity-ktx:1.8.2")
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.10.0")
+    implementation("com.google.android.material:material:1.11.0")
 
     // Compose
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
@@ -66,15 +69,31 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
 
+    // Navigation
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.6")
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:2.7.6")
+    implementation("androidx.navigation:navigation-compose:2.7.6")
+
     // Hilt
-    implementation("com.google.dagger:hilt-android:2.45")
-    kapt("com.google.dagger:hilt-android-compiler:2.45")
+    implementation("com.google.dagger:hilt-android:2.48")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    kapt("com.google.dagger:hilt-android-compiler:2.48")
+
+    // Coil
+    implementation("io.coil-kt:coil:2.5.0")
+    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation("io.coil-kt:coil-svg:2.5.0")
 
     // Retrofit and Networking
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
     implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
+
+    // Gson
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
     // Room
     implementation("androidx.room:room-runtime:2.6.1")
@@ -84,12 +103,18 @@ dependencies {
     // Text Recognition and CameraX
     implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
     implementation("com.google.android.gms:play-services-mlkit-text-recognition-common:19.0.0")
-    implementation("androidx.camera:camera-core:1.4.0-alpha02")
-    implementation("androidx.camera:camera-camera2:1.4.0-alpha02")
-    implementation("androidx.camera:camera-lifecycle:1.4.0-alpha02")
-    implementation("androidx.camera:camera-view:1.4.0-alpha02")
-    implementation("androidx.camera:camera-extensions:1.4.0-alpha02")
-    implementation("androidx.camera:camera-mlkit-vision:1.4.0-alpha02")
+    implementation("androidx.camera:camera-core:1.4.0-alpha04")
+    implementation("androidx.camera:camera-camera2:1.4.0-alpha04")
+    implementation("androidx.camera:camera-lifecycle:1.4.0-alpha04")
+    implementation("androidx.camera:camera-view:1.4.0-alpha04")
+    implementation("androidx.camera:camera-extensions:1.4.0-alpha04")
+    implementation("androidx.camera:camera-mlkit-vision:1.4.0-alpha04")
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
 
     // Permission Handling
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
@@ -100,6 +125,8 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    androidTestImplementation("androidx.navigation:navigation-testing:2.7.6")
+    androidTestImplementation("io.coil-kt:coil-test:2.5.0")
 
     // Debugging Libraries
     debugImplementation("androidx.compose.ui:ui-tooling")

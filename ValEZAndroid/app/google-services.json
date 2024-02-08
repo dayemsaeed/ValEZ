@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "732749955329",
+    "project_id": "valez-4f641",
+    "storage_bucket": "valez-4f641.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:732749955329:android:bce38cc9b12afdaec61b00",
+        "android_client_info": {
+          "package_name": "com.lumen.valez_android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJBH5Lm6gxzDyeDWqpWTdDhpsP-5a7mJA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
