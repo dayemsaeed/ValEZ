@@ -7,6 +7,6 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface CarsApi {
-    @GET("/vehicles/DecodeVinExtended/{vin}")
-    suspend fun getCarInfo(@Path("vin") vin: String, @Query("format") format: String, @Query("modelyear") modelYear: String): Response<CarInfo>
+    @GET("vehicles/DecodeVinExtended/{vin}")
+    suspend fun getCarInfo(@Path("vin") vin: String, @Query("format") format: String): Response<CarInfo>
 }

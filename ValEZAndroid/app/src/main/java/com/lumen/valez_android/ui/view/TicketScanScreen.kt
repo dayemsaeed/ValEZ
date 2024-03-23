@@ -3,7 +3,7 @@ package com.lumen.valez_android.ui.view
 import android.Manifest
 import android.graphics.Rect
 import android.util.Log
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -48,12 +49,12 @@ import com.lumen.valez_android.viewmodel.CarViewModel
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun VinScanScreen(navController: NavController, viewModel: CarViewModel) {
+fun TicketScanScreen(navController: NavController, viewModel: CarViewModel) {
     ValEZAndroidTheme {
         // Camera permission state
         val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
-        // VIN text and bounding box state
-        var recognizedVin by remember { mutableStateOf("") }
+        // Ticket text and bounding box state
+        var ticketNumber by remember { mutableStateOf("") }
         var boundingBox by remember { mutableStateOf<Rect?>(null) }
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -61,29 +62,18 @@ fun VinScanScreen(navController: NavController, viewModel: CarViewModel) {
         ) {
             when {
                 cameraPermissionState.status.isGranted -> {
-                    CameraPreview { text, box ->
-                        recognizedVin = text
+                    ScannerPreview { text, box ->
+                        ticketNumber = text
                         boundingBox = box
-                        viewModel.fetchCarInfo(recognizedVin)
-                    }
-                    val carDetails by viewModel.carDetails.observeAsState()
-                    LaunchedEffect(carDetails) {
-                        if (carDetails != null) {
-                            carDetails.let {
-                                viewModel.make.value = it?.Results?.get(7)?.Value.toString() // Update ViewModel with fetched details
-                                viewModel.model.value = it?.Results?.get(12)?.Value.toString()
-                                viewModel.licenseVin.value = recognizedVin
-                                navController.currentBackStackEntry?.savedStateHandle?.set("carDetails", it)
-                                navController.popBackStack()
-                            }
-                        }
+                        viewModel.ticketNumber.value = ticketNumber
+                        navController.popBackStack()
                     }
 
                     // Draw a rectangle and VIN text if a VIN is detected
                     boundingBox?.let { box ->
                         DrawBoundingBox(box)
                         Text(
-                            text = recognizedVin,
+                            text = ticketNumber,
                             modifier = Modifier
                                 .offset(
                                     x = with(LocalDensity.current) { box.left.toDp() },
@@ -108,7 +98,7 @@ fun VinScanScreen(navController: NavController, viewModel: CarViewModel) {
 }
 
 @Composable
-fun CameraPreview(
+fun ScannerPreview(
     onTextRecognized: (String, Rect) -> Unit
 ) {
     val context = LocalContext.current
@@ -118,10 +108,10 @@ fun CameraPreview(
 
     // Set up the text recognition analysis
     val textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-    val analyzer = provideTextRecognitionAnalyzer { text, rect ->
-        val vin = extractVin(text)
-        if (vin != null) {
-            onTextRecognized(vin, rect) // Provide VIN and bounding box
+    val analyzer = provideTicketRecognitionAnalyzer { text, rect ->
+        val ticket = extractTicketNum(text)
+        if (ticket != null) {
+            onTextRecognized(ticket, rect) // Provide VIN and bounding box
         }
     }
     cameraController.setImageAnalysisAnalyzer(
@@ -132,7 +122,7 @@ fun CameraPreview(
     AndroidView(
         factory = { ctx ->
             PreviewView(ctx).apply {
-                layoutParams = LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+                layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
                 controller = cameraController
             }
         },
@@ -140,25 +130,8 @@ fun CameraPreview(
     )
 }
 
-@Composable
-fun DrawBoundingBox(boundingBox: Rect) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Canvas(modifier = Modifier.matchParentSize()) {
-            drawRect(
-                color = Color.Red,
-                topLeft = Offset(boundingBox.left.toFloat(), boundingBox.top.toFloat()),
-                size = Size(
-                    width = boundingBox.width().toFloat(),
-                    height = boundingBox.height().toFloat()
-                ),
-                style = Stroke(width = 3.dp.toPx())
-            )
-        }
-    }
-}
-
 @androidx.annotation.OptIn(ExperimentalGetImage::class)
-fun provideTextRecognitionAnalyzer(onTextRecognized: (String, Rect) -> Unit): ImageAnalysis.Analyzer {
+fun provideTicketRecognitionAnalyzer(onTextRecognized: (String, Rect) -> Unit): ImageAnalysis.Analyzer {
     val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
     return ImageAnalysis.Analyzer { imageProxy ->
@@ -187,8 +160,8 @@ fun provideTextRecognitionAnalyzer(onTextRecognized: (String, Rect) -> Unit): Im
     }
 }
 
-fun extractVin(text: String): String? {
-    val vinRegex = "[A-HJ-NPR-Z0-9]{17}".toRegex()
-    val matchResult = vinRegex.find(text)
+fun extractTicketNum(text: String): String? {
+    val ticketRegex = "\\b\\d{6}\\b".toRegex()
+    val matchResult = ticketRegex.find(text)
     return matchResult?.value // This will be the VIN if found, or null if not found
 }
